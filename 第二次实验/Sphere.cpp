@@ -26,9 +26,9 @@ bool Sphere::intersect(Ray ray, Hit &hit) {
         double t0 = (-b + sqrt(discr)) / (2 * a);
         double t1 = (-b - sqrt(discr)) / (2 * a);
 
-        if (t0 >= 5E-5 && t1 >= 5E-5) {
+        if (t0 >= 5E-4 && t1 >= 5E-4) {
             hit.t_ = std::min(t0, t1);
-        } else if (t0 >= 5E-5 || t1 >= 5E-5) {
+        } else if (t0 >= 5E-4 || t1 >= 5E-4) {
             hit.t_ = std::max(t0, t1);
         }
 
@@ -41,5 +41,6 @@ bool Sphere::intersect(Ray ray, Hit &hit) {
 
     hit.P_ = hit.P_ + center_;
     hit.N_.normalize();
+    hit.obj_ = this;
     return true;
 }

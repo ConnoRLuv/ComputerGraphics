@@ -20,7 +20,7 @@ public:
     double alpha_;
     double refractIndex_;
     double specExponent_;
-    double reflectionCoeff_;
+    double reflectionCoeff_ = 0;
 
     Material() =default;
 };

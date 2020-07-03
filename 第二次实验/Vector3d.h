@@ -17,14 +17,14 @@ class Vector3d { public:  double x_, y_, z_;
     double dot(Vector3d& v);
 
     Vector3d operator-(const Vector3d& v);
-
+    Vector3d operator-();
     Vector3d operator+(const Vector3d& v);
 
     Vector3d operator*(const double x);
 
     Vector3d operator/(const double x);
 
-    double mag();
+    double mag() const;
 
     void normalize(); };
 #endif //CG_VECTOR3D_H

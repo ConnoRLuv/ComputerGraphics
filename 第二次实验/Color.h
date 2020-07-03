@@ -12,6 +12,7 @@ public:
     Color(double r = 0, double g = 0, double b = 0) : r_{r}, g_{g}, b_{b} {};
 
     Color operator+(const Color &c)   { return {r_ + c.r_, g_ + c.g_, b_ + c.b_}; };
+    Color operator-(const Color &c)   { return {r_ - c.r_, g_ - c.g_, b_ - c.b_}; };
 
     Color operator*(const Color &c) const  { return {r_ * c.r_, g_ * c.g_, b_ * c.b_}; };
 
@@ -19,7 +20,11 @@ public:
 
     Color operator==(const Color &c) const  { return r_ == c.r_ && g_ == c.g_ && b_ == c.b_; };
 
-    Color operator+=(const Color &c) const  { return {r_ + c.r_, g_ + c.g_, b_ + c.b_}; };
+    void operator+=(const Color &c)   {
+        r_ += c.r_;
+        g_ += c.g_;
+        b_ += c.b_;
+    };
 };
 
 #endif //CG_COLOR_H

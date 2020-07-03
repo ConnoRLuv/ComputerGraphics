@@ -26,11 +26,12 @@ Vector3d Vector3d::operator*(const double x)  { return {x_ * x, y_ * x, z_ * x};
 
 Vector3d Vector3d::operator/(const double x)  { return {x_ / x, y_ / x, z_ / x}; }
 
+Vector3d Vector3d::operator-()  { return {-x_,-y_,-z_}; }
 
-double Vector3d::mag() { return sqrtf (x_ * x_ + y_ * y_ + z_ * z_); }
+double Vector3d::mag() const { return sqrt (x_ * x_ + y_ * y_ + z_ * z_); }
 
 void Vector3d::normalize() {
-    float m = mag();
+    double m = mag();
     x_ = x_ / m;
     y_ = y_ / m;
     z_ = z_ / m;

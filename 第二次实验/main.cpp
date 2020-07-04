@@ -9,7 +9,7 @@
 #include "Flat.h"
 
 
-const int MAX_RECURSION_DEPTH = 3;
+const int MAX_RECURSION_DEPTH = 2;
 const double VIEWPORT_X = 16;
 const double VIEWPORT_Y = 12;
 const double FOCAL_LENGTH = 0;
@@ -45,14 +45,14 @@ void ConstructScene() {
 
 
     sphere = new Sphere;
-    sphere->center_ = Vector3d (3.0f, 0.25f, 1.0f);         //设置圆心位置
+    sphere->center_ = Vector3d (2.0f, 2.25f, 5.0f);         //设置圆心位置
     sphere->radius_ = 1.25;             //设置圆半径
-    sphere->material_.diffuseColor_ = Color (0.3f, 0.3f, 0.3f);     //漫反射系数
-    sphere->material_.ambientColor_ = Color (0.3f, 0.3f, 0.3f);     //环境光反射系数
+    sphere->material_.diffuseColor_ = Color (0.0f, 0.0f, 0.0f);     //漫反射系数
+    sphere->material_.ambientColor_ = Color (0.0f, 0.0f, 0.0f);     //环境光反射系数
     sphere->material_.specularColor_ = Color (specular_a, specular_a, specular_a);  //镜面反射系数
     sphere->material_.alpha_ = 1.0;
     sphere->material_.refractIndex_ = 0.5;
-    sphere->material_.reflectionCoeff_ = 0.2;
+    sphere->material_.reflectionCoeff_ = 0.0;
     sphere->material_.specExponent_ = 80.0;     //反射指数，此值越大，则高光区域越集中
     objects.push_back (sphere);
 
@@ -62,7 +62,7 @@ void ConstructScene() {
 //    sphere->material_.diffuseColor_ = Color (0.3f, 0.3f, 0.8f);
 //    sphere->material_.ambientColor_ = Color (0.3f, 0.3f, 0.8f);
 //    sphere->material_.specularColor_ = Color (specular_a, specular_a, specular_a);
-//    sphere->material_.alpha_ = 0.2;
+//    sphere->material_.alpha_ = 0.0;
 //    sphere->material_.refractIndex_ = 0.5;
 ////    sphere->material_.reflectionCoeff_ = 0.8;
 //    sphere->material_.specExponent_ = 60.0;
@@ -117,7 +117,7 @@ void ConstructScene() {
     cube->material_.diffuseColor_ = Color (0.3f, 0.3f, 0.9f);
     cube->material_.ambientColor_ = Color (0.3f, 0.3f, 0.9f);
     cube->material_.specularColor_ = Color (0.6f, 0.6f, 0.6f);
-    cube->material_.alpha_ = 1.0;
+    cube->material_.alpha_ = 0.0;
     cube->material_.refractIndex_ = 0.5;
     cube->material_.specExponent_ = 10.0;
     objects.push_back (cube);
@@ -136,7 +136,7 @@ void ConstructScene() {
     flat_bottom->material_.diffuseColor_ = Color (0.1f, 0.1f, 0.1f);
     flat_bottom->material_.ambientColor_ = Color (0.1f, 0.1f, 0.1f);
     flat_bottom->material_.specularColor_ = Color (0.2f, 0.2f, 0.2f);
-    flat_bottom->material_.alpha_ = 1.0;
+    flat_bottom->material_.alpha_ = 0.0;
     flat_bottom->material_.refractIndex_ = 0.5;
     flat_bottom->material_.reflectionCoeff_ = 0.8;
     flat_bottom->material_.specExponent_ = 10.0;
@@ -156,7 +156,7 @@ void ConstructScene() {
     flat_left->material_.diffuseColor_ = Color (0.1f, 0.1f, 0.1f);
     flat_left->material_.ambientColor_ = Color (0.1f, 0.1f, 0.1f);
     flat_left->material_.specularColor_ = Color (0.2f, 0.2f, 0.2f);
-    flat_left->material_.alpha_ = 1.0;
+    flat_left->material_.alpha_ = 0.0;
     flat_left->material_.refractIndex_ = 0.5;
     flat_left->material_.reflectionCoeff_ =  0.8;
     flat_left->material_.specExponent_ = 10.0;
@@ -176,7 +176,7 @@ void ConstructScene() {
     flat_back->material_.diffuseColor_ = Color (0.1f, 0.1f, 0.1f);
     flat_back->material_.ambientColor_ = Color (0.1f, 0.1f, 0.1f);
     flat_back->material_.specularColor_ = Color (0.2f, 0.2f, 0.2f);
-    flat_back->material_.alpha_ = 1.0;
+    flat_back->material_.alpha_ = 0.0;
     flat_back->material_.refractIndex_ = 0.5;
     flat_back->material_.reflectionCoeff_ =  0.8;
     flat_back->material_.specExponent_ = 10.0;
@@ -232,13 +232,12 @@ Hit RayCast(Ray &ray, int depth) {
 
             //Diffuse Lighting
             double dot1 = lightRay.directionVector_.dot (rayHit.N_);
-            rayHit.material_.color_ =
-                    rayHit.material_.color_ + light.color_ * rayHit.material_.diffuseColor_ * std::max (0.0, dot1);
+            rayHit.material_.color_ += light.color_ * rayHit.material_.diffuseColor_ * std::max (0.0, dot1);
 
             //Specular Lighting
             double dot2 = h.dot (rayHit.N_);
             double hnorm = powf (dot2, rayHit.material_.specExponent_);
-            rayHit.material_.color_ = rayHit.material_.color_ + light.color_ * rayHit.material_.specularColor_ * hnorm;
+            rayHit.material_.color_ += light.color_ * rayHit.material_.specularColor_ * hnorm;
 
 
         }
@@ -253,21 +252,30 @@ Hit RayCast(Ray &ray, int depth) {
                     reflected_ray.directionVector_ -
                     ((rayHit.N_ * reflected_ray.directionVector_.dot (rayHit.N_)) * 2.0);
             reflected_ray.directionVector_.normalize();
-            Hit tmp = RayCast (reflected_ray, depth - 1);
-            rayHit.material_.color_ += tmp.material_.color_ * rayHit.material_.reflectionCoeff_;
+            Hit reflected_rayHit = RayCast (reflected_ray, depth - 1);
+            rayHit.material_.color_ += reflected_rayHit.material_.color_ * rayHit.material_.reflectionCoeff_;
         }
-//        else if(rayHit.material_.alpha_ != 1.0){
-//            double ni = 1.0;
-//            double nT = rayHit.material_.refractIndex_;
-//
-//            double cosT = sqrt(1-ni*ni*(1-pow(ray.directionVector_.dot(rayHit.N_),2))/(nT*nT));
-//            Ray refracted_ray1;
-//            refracted_ray1.origin_ = rayHit.P_;
-//            refracted_ray1.directionVector_ = -ray.directionVector_ * (-ni/nT) + rayHit.N_*(ni/nT * (-ray.directionVector_).dot(rayHit.N_) - cosT)  ;
-//            refracted_ray1.directionVector_.normalize();
-//            Hit tmp = RayCast (refracted_ray1, depth - 1);
-//            rayHit.material_.color_ += tmp.material_.color_ * rayHit.material_.alpha_;
-//        }
+        else if(rayHit.material_.alpha_ != 0.0){
+            double ni = 0.1;
+            double nT = rayHit.material_.refractIndex_;
+            double tmp1 = ray.directionVector_.dot(rayHit.N_);
+            double cosT = sqrt(1-ni*ni*(1-pow(tmp1,2))/(nT*nT));
+            Ray refracted_ray1;
+            refracted_ray1.origin_ = rayHit.P_;
+            refracted_ray1.directionVector_ = -ray.directionVector_ * (-ni/nT) + rayHit.N_*(ni/nT * (-ray.directionVector_).dot(rayHit.N_) - cosT)  ;
+            refracted_ray1.directionVector_.normalize();
+
+            Hit tmp = DetectSceneHit (refracted_ray1);
+            ni = tmp.material_.refractIndex_;
+            nT = 0.1;
+            Ray refracted_ray2;
+            refracted_ray2.origin_ = tmp.P_;
+            refracted_ray2.directionVector_ = -refracted_ray1.directionVector_ * (-ni/nT) + rayHit.N_*(ni/nT * (-ray.directionVector_).dot(rayHit.N_) - cosT)  ;
+            refracted_ray2.directionVector_.normalize();
+
+            Hit tmp2 = RayCast(refracted_ray2,1);
+            rayHit.material_.color_ += tmp2.material_.color_ * (rayHit.material_.alpha_+1);
+        }
 
         return rayHit;
     } else {
